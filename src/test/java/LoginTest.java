@@ -15,6 +15,8 @@ import page_object.MainPage;
 import page_object.RecoverPasswordPage;
 import page_object.RegisterPage;
 import java.util.concurrent.TimeUnit;
+
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.hamcrest.Matchers.equalTo;
 import static WebDriverFactory.WebDriverSwitch.getWebDriver;
 
@@ -22,9 +24,9 @@ import static WebDriverFactory.WebDriverSwitch.getWebDriver;
 public class LoginTest {
     private WebDriver driver;
     private String driverType;
-    String name = "mmcmccccc";
-    String email = "mcjfnvhfnvhnf@yandex.ru";
-    String password = "jcnhjcd;0333==";
+    String name = randomAlphanumeric(4, 8);
+    String email = randomAlphanumeric(6, 10) + "@yandex.ru";;
+    String password = randomAlphanumeric(6, 10);
 
 
     public static String accessToken;
@@ -124,6 +126,7 @@ public class LoginTest {
 
     @After
     public void tearDown() {
+        RestAssured.baseURI = "https://stellarburgers.nomoreparties.site";
         accessToken = UserClient.checkRequestAuthLogin(RegistrationTest.user).then().extract().path("accessToken");
         if (accessToken != null){
             UserClient.deleteUser(accessToken);

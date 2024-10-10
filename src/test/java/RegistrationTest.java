@@ -3,19 +3,15 @@ import client.UserClient;
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
-import org.hamcrest.MatcherAssert;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import page_object.LoginPage;
 import page_object.MainPage;
 import page_object.RegisterPage;
-
 import java.util.concurrent.TimeUnit;
-
+import static WebDriverFactory.WebDriverSwitch.getWebDriver;
 import static org.apache.commons.lang3.RandomStringUtils.*;
 
 @RunWith(Parameterized.class)
@@ -28,7 +24,7 @@ public class RegistrationTest {
     static String name = randomAlphanumeric(4, 8);
     static String email = randomAlphanumeric(6, 10) + "@yandex.ru";
     static String password = randomAlphanumeric(10, 20);
-    String wrongPassword = randomAlphanumeric(1, 5);
+    static String wrongPassword = randomAlphanumeric(1, 5);
     static User user = new User(name, email, password);
 
 
@@ -38,19 +34,9 @@ public class RegistrationTest {
 
     @Before
     public void startUp() {
-        if (driverType.equals("chromedriver")) {
-            System.setProperty("webdriver.chrome.driver", "C:/Users/lewims/IdeaProjects/Diplom__3/src/main/resources/chromedriver");
-            ChromeOptions options = new ChromeOptions();
-            driver = new ChromeDriver(options);
-            driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
-            driver.navigate().to("https://stellarburgers.nomoreparties.site/");
-        } else if (driverType.equals("yandexdriver")) {
-            System.setProperty("webdriver.chrome.driver", "C:/Users/lewims/IdeaProjects/Diplom__3/src/main/resources/yandexdriver");
-            ChromeOptions options = new ChromeOptions();
-            driver = new ChromeDriver(options);
-            driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
-            driver.navigate().to("https://stellarburgers.nomoreparties.site/");
-        }
+        driver = getWebDriver(driverType);
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        driver.navigate().to("https://stellarburgers.nomoreparties.site/");
     }
 
     @Parameterized.Parameters(name = "Результаты проверок браузера: {0}")
@@ -86,7 +72,6 @@ public class RegistrationTest {
         RegisterPage registerPage = new RegisterPage(driver);
         registerPage.waitForLoadRegisterPage();
         registerPage.registration(name, email, wrongPassword);
-        //Проверка появление текста "Некорректный пароль"
         Assert.assertTrue("Некорректный пароль", driver.findElement(registerPage.errorPasswordText).isDisplayed());
     }
 
@@ -99,6 +84,4 @@ public class RegistrationTest {
         }
         driver.quit();
     }
-
-
 }

@@ -17,7 +17,7 @@ public class RegisterPage {
     private final By registerButton = By.xpath(".//button[text()='Зарегистрироваться']");
     public final By errorPasswordText = By.xpath(".//p[text()='Некорректный пароль']");
     public final By registerText = By.xpath(".//div/h2[text()='Регистрация']");
-    public final By loginButtonOnRegisterPage = By.xpath((".//div/p/a[contains(@class, 'Auth_link__1fOlj')]"));
+    public final By loginButtonOnRegisterPage = By.xpath(".//div/p/a[text()='Войти']");
 
     public RegisterPage(WebDriver driver) {
         this.driver = driver;

@@ -15,7 +15,7 @@ public class MainPage {
     private final WebDriver driver;
 
     private final By loginButton = By.xpath(".//button[text()='Войти в аккаунт']");
-    private final By accountButton = By.xpath(".//a[@href='/account']");
+    private final By accountButton = By.xpath(".//a/p[text()='Личный Кабинет']");
     private final By logo = By.xpath(".//div/a[@href='/']");
     private final By constructorButton = By.xpath(".//p[text()='Конструктор']");
     private final By bunsButton = By.xpath("//span[@class='text text_type_main-default'][text()='Булки']");

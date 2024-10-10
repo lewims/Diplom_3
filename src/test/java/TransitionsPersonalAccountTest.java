@@ -10,22 +10,18 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import page_object.LoginPage;
 import page_object.MainPage;
 import page_object.ProfilePage;
-import page_object.RegisterPage;
-
 import java.util.concurrent.TimeUnit;
-
+import static WebDriverFactory.WebDriverSwitch.getWebDriver;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 
 @RunWith(Parameterized.class)
 public class TransitionsPersonalAccountTest {
 
     private WebDriver driver;
-    private String driverType; //добавила в код
+    private String driverType;
     static String name = randomAlphanumeric(4, 8);
     static String email = randomAlphanumeric(6, 10) + "@yandex.ru";
     static String password = randomAlphanumeric(10, 20);
@@ -37,37 +33,17 @@ public class TransitionsPersonalAccountTest {
 
     @Before
     public void startUp() {
-        if (driverType.equals("chromedriver")) {
-            System.setProperty("webdriver.chrome.driver", "C:/Users/lewims/IdeaProjects/Diplom__3/src/main/resources/chromedriver");
-            ChromeOptions options = new ChromeOptions();
-            driver = new ChromeDriver(options);
-            driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
-            driver.navigate().to("https://stellarburgers.nomoreparties.site/");
-            MainPage mainPage = new MainPage(driver);
-            mainPage.clickOnLoginButton();
-            LoginPage loginPage = new LoginPage(driver);
-            loginPage.clickOnRegister();
-            RegisterPage registerPage = new RegisterPage(driver);
-            registerPage.waitForLoadRegisterPage();
-            registerPage.registration(name, email, password);
-            loginPage.waitForLoadEntrance();
-            loginPage.authorization(email, password);
-        } else if (driverType.equals("yandexdriver")) {
-            System.setProperty("webdriver.chrome.driver", "C:/Users/lewims/IdeaProjects/Diplom__3/src/main/resources/yandexdriver");
-            ChromeOptions options = new ChromeOptions();
-            driver = new ChromeDriver(options);
-            driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
-            driver.navigate().to("https://stellarburgers.nomoreparties.site/");
-            MainPage mainPage = new MainPage(driver);
-            mainPage.clickOnLoginButton();
-            LoginPage loginPage = new LoginPage(driver);
-            loginPage.clickOnRegister();
-            RegisterPage registerPage = new RegisterPage(driver);
-            registerPage.waitForLoadRegisterPage();
-            registerPage.registration(name, email, password);
-            loginPage.waitForLoadEntrance();
-            loginPage.authorization(email, password);
-        }
+        RestAssured.baseURI = "https://stellarburgers.nomoreparties.site";
+        User user = new User(name, email, password);
+        UserClient.postCreateNewUser(user);
+        driver = getWebDriver(driverType);
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        driver.navigate().to("https://stellarburgers.nomoreparties.site/");
+        MainPage mainPage = new MainPage(driver);
+        mainPage.clickOnLoginButton();
+        LoginPage loginPage = new LoginPage(driver);
+        loginPage.authorization(email, password);
+        mainPage.waitForLoadMainPage();
     }
 
     @Parameterized.Parameters(name = "Результаты проверок браузера: {0}")
@@ -83,6 +59,7 @@ public class TransitionsPersonalAccountTest {
     @Description("Проверка перехода по клику на 'Личный кабинет'.")
     public void transitionToProfilePageTest() {
         MainPage mainPage = new MainPage(driver);
+        mainPage.waitForLoadMainPage();
         mainPage.clickOnAccountButton();
         ProfilePage profilePage = new ProfilePage(driver);
         profilePage.waitForLoadProfilePage();
@@ -94,7 +71,7 @@ public class TransitionsPersonalAccountTest {
     @Description("Проверка перехода на вкладку 'Конструктор' из страницы авторизации пользователя.")
     public void transitionToConstructorFromProfilePageTest() {
         MainPage mainPage = new MainPage(driver);
-        mainPage.waitForInvisibilityLoadingAnimation();
+        mainPage.waitForLoadMainPage();
         mainPage.clickOnAccountButton();
         ProfilePage profilePage = new ProfilePage(driver);
         profilePage.waitForLoadProfilePage();
@@ -108,6 +85,7 @@ public class TransitionsPersonalAccountTest {
     @Description("Проверка перехода в конструктор при нажатии на логотип 'Stellar Burgers'.")
     public void transitionToStellarBurgersFromProfilePageTest() {
         MainPage mainPage = new MainPage(driver);
+        mainPage.waitForLoadMainPage();
         mainPage.clickOnAccountButton();
         ProfilePage profilePage = new ProfilePage(driver);
         profilePage.waitForLoadProfilePage();
@@ -121,6 +99,7 @@ public class TransitionsPersonalAccountTest {
     @Description("Проверка выхода по кнопке 'Выйти' в личном кабинете.")
     public void exitFromProfileTest() {
         MainPage mainPage = new MainPage(driver);
+        mainPage.waitForLoadMainPage();
         mainPage.clickOnAccountButton();
         ProfilePage profilePage = new ProfilePage(driver);
         profilePage.waitForLoadProfilePage();
@@ -139,5 +118,4 @@ public class TransitionsPersonalAccountTest {
         }
         driver.quit();
     }
-
 }
